@@ -1,336 +1,352 @@
 # mateus-lopes -> https://github.com/mateus-lopes
+# lucasxaviervieira -> https://github.com/lucasxaviervieira
+
 """ WORD GAME """
-from sys import exit
+import sys
 from random import shuffle, choice
+from functions import manage_db as mn
 
-print('\nBem vindo ao Word Game, um jogo de raciocínio que irá aumentar seu vocabulario rapidamente.\n')
-print('Responda as perguntas com S/N para logar ou criar uma conta.')
-print('Em caso de duvidas acesse "Ajuda" no menu de configurações')
 
-# config database
-author = 'mateus-lopes -> https://github.com/mateus-lopes'
-points = 0
-
-db = {
-    'topics' : {
-        "1": {
-            "1": [
-                'Ema',
-                'Naja',
-                'Vaca',
-                'Zebu',
-                'Foca',
-                'Rato',
-                'Leão'
-            ],
-            "2": [
-                'Hiena',
-                'Sagui',
-                'Quati',
-                'Urubu',
-                'Veado',
-                'Ovelha',
-                'Abelha',
-                'Iguana',
-                'Impala',
-                'Jaguar',
-                'Jacaré',
-                'Macaco',
-                'Perdiz',
-                'Raposa',
-                'Lagarto',
-                'Babuíno'
-            ],
-            "3": [
-                'Kakapo',
-                'Cachorro',
-                'Sardinha',
-                'Papagaio',
-                'Golfinho',
-                'Queixada',
-                'Tartaruga',
-                'Musaranho',
-                'Hipopótamo',
-                'Orangotango',
-                'Dragão-de-komodo'
-            ]
-        },
-        "2": {
-            "1": [
-                'Noz',
-                'Açaí',
-                'Maçã',
-                'Kiwi',
-                'Coco',
-                'Romã',
-            ],
-            "2": [
-                'Ajarí',
-                'Amora',
-                'Avelã',
-                'Ameixa',
-                'Banana',
-                'Tomate',
-                'Acerola',
-                'Laranja',
-                'Damasco'
-            ],
-            "3": [
-                'Abacate',
-                'Abacaxi',
-                'Aboirana',
-                'Azeitona',
-                'Melancia',
-                'Maça Verde',
-                'Bergamota',
-                'Pêssego do campo',
-                'Castanha do Pará'
-            ]
-        },
-        "3": {
-            "1": [
-                'Ana',
-                'Abel',
-                'Adão',
-                'Diná',
-                'Davi',
-                'Bela',
-                'Caim',
-                'César',
-                'André',
-                'Cristo',
-                'Daniel'
-            ],
-            "2": [
-                'Abraão',
-                'Calebe',
-                'Débora',
-                'Isabel',
-                'Isaías',
-                'Isaque',
-                'Ismael',
-                'Israel',
-                'Eunice',
-                'Golias',
-                'Itamar',
-                'Cláudio',
-                'Cléofas',
-                'Augusto'
-            ],
-            "3": [
-                'Nicolau',
-                'Betânia',
-                'Finéias',
-                'Ezequiel',
-                'Baltasar',
-                'Demétrio',
-                'Natanael',
-                'Benjamim',
-                'Zacarias',
-                'Zorobabel',
-                'Fortunato',
-                'Bartolomeu',
-                'Quedorlaomer'
-            ]
-        }
+topics = {
+    "1": {
+        "1": [
+            "Ema",
+            "Naja",
+            "Vaca",
+            "Zebu",
+            "Foca",
+            "Rato",
+            "Leão"
+        ],
+        "2": [
+            "Hiena",
+            "Sagui",
+            "Quati",
+            "Urubu",
+            "Veado",
+            "Ovelha",
+            "Abelha",
+            "Iguana",
+            "Impala",
+            "Jaguar",
+            "Jacaré",
+            "Macaco",
+            "Perdiz",
+            "Raposa",
+            "Lagarto",
+            "Babuíno",
+        ],
+        "3": [
+            "Kakapo",
+            "Cachorro",
+            "Sardinha",
+            "Papagaio",
+            "Golfinho",
+            "Queixada",
+            "Tartaruga",
+            "Musaranho",
+            "Hipopótamo",
+            "Orangotango",
+            "Dragão-de-komodo",
+        ],
     },
-    'users': [
-        {
-            'id': 'ABC123',
-            'nickname':'mateus-lopes',
-            'password':'mateus',
-            'points': '0',
-        },
-    ]
+    "2": {
+        "1": [
+            "Noz", 
+            "Açaí", 
+            "Maçã", 
+            "Kiwi", 
+            "Coco", 
+            "Romã"
+        ],
+        "2": [
+            "Ajarí",
+            "Amora",
+            "Avelã",
+            "Ameixa",
+            "Banana",
+            "Tomate",
+            "Acerola",
+            "Laranja",
+            "Damasco",
+        ],
+        "3": [
+            "Abacate",
+            "Abacaxi",
+            "Aboirana",
+            "Azeitona",
+            "Melancia",
+            "Maça Verde",
+            "Bergamota",
+            "Pêssego do campo",
+            "Castanha do Pará",
+        ],
+    },
+    "3": {
+        "1": [
+            "Ana",
+            "Abel",
+            "Adão",
+            "Diná",
+            "Davi",
+            "Bela",
+            "Caim",
+            "César",
+            "André",
+            "Cristo",
+            "Daniel",
+        ],
+        "2": [
+            "Abraão",
+            "Calebe",
+            "Débora",
+            "Isabel",
+            "Isaías",
+            "Isaque",
+            "Ismael",
+            "Israel",
+            "Eunice",
+            "Golias",
+            "Itamar",
+            "Cláudio",
+            "Cléofas",
+            "Augusto",
+        ],
+        "3": [
+            "Nicolau",
+            "Betânia",
+            "Finéias",
+            "Ezequiel",
+            "Baltasar",
+            "Demétrio",
+            "Natanael",
+            "Benjamim",
+            "Zacarias",
+            "Zorobabel",
+            "Fortunato",
+            "Bartolomeu",
+            "Quedorlaomer",
+        ],
+    },
 }
-
-def main(db):
-    global points
-    topics = db['topics']
-
-    # log_in
-
-    # create_user
-
-    def get_account():
-        account = input('\nÉ sua primeira vez no word game? ')
-        user = {}
-        while True:
-            if account.lower() == "s":
-                print('\nCrie sua Conta\n')
-                user['nickname'] = input('Digite seu nome de usuário: ')
-                user['password'] = input('Digite sua senha: ')
-                user['confirm_password'] = input('Confirme sua senha: ')
-                start_navbar(user)
-            elif account.lower() == "n":
-                print('\nLogin\n')
-                user['nickname'] = input('Digite seu nome de usuário: ')
-                user['password'] = input('Digite sua senha: ')
-                start_navbar(user)
-            else:
-                print("comando não detectado")
-                account = input('\nÉ sua primeira vez no word game? ')
-    
-    def start_game(user, topics, choose_difficulty, choose_topic):
-        global points
-        
-        # funções de suporte 
-        def shuffle_word(string):
-            for i in string:
-                scrambled_word.append(i)
-            shuffle(scrambled_word)
-            return " ".join(scrambled_word)
-
-        def return_points(p):
-            global points
-            points += p
-            return 'vc recebeu mais {} pontos ficando com {}'.format(p , points)
-        
-        # configuração inicial de partida
-        if not choose_difficulty and not choose_topic:
-            print('\nEscolha a dificuldade')
-            print('1 - Iniciante')
-            print('2 - Intermediário')
-            print('3 - Avançado')
-            choose_difficulty = input("Selecione: ")
-            print('\nEscolha a dificuldade')
-            print('1 - Animais')
-            print('2 - Frutas')
-            print('3 - Persongens Bíblicos')
-            choose_topic = input("Selecione: ")
-        print("\n" + ('*' * 14))
-        print("  START GAME")
-        print('*' * 14)
-        print('\ntotal de pontos - [ {} ]'.format(points))
+authors = [
+    "mateus-lopes -> https://github.com/mateus-lopes",
+    "lucasxaviervieira -> https://github.com/lucasxaviervieira ",
+]
 
 
-        # apresentando a palavra selecionada
-        word = choice(topics[choose_topic][choose_difficulty]) 
-        scrambled_word = []
-        print('\n--- [ {} ] --- '.format(shuffle_word(word).upper()))
+def main():
+    print(
+        "\nBem vindo ao Word Game, um jogo de raciocínio que irá aumentar seu vocabulario rapidamente.\n"
+    )
+    print("Responda as perguntas com S/N para logar ou criar uma conta.")
+    print('Em caso de duvidas acesse "Ajuda" no menu de configurações')
 
-        # config tentativas
-        resultado, c, tentativa = False, 0, ""
-        while c < 7:
-            c += 1
-            if tentativa.lower() == word.lower():
-                resultado = True
-                break
-            else:
-                if c < 6:
-                    if c != 5:
-                        print("\nVocê ainda tem {} chances".format(str(6 - c)))
-                    else:
-                        print("\nÚltima Tentativa!")
-                    tentativa = input("Tentativa numero {}: ".format(c))
-
-        
-        # config resultado
-        sentences_replay = [
-            "Poxa não foi dessa vez... Tente mais uma vez",
-            "Vamos lá, você consegue!",
-            "Nossa passou perto...",
-        ]
-        if resultado:
-            print("\nVocê Conseguiu!!! - na {} tentaviva\n".format(c - 1))
-            if (c) == 1:
-                return_points(50)
-            elif (c) == 2:
-                return_points(40)
-            elif (c) == 3:
-                return_points(30)
-            elif (c) == 4:
-                return_points(20)
-            else:
-                return_points(10)
-        else:
-            print("\n" + choice(sentences_replay) + "\n")
-            print("A palavra era -- {} --".format(word))
-
-        # config para jogar denovo
-        replay = input("\nQuer jogar denovo? (S/N): ")
-        while True:
-            if replay.lower() == "s":
-                change_options = input("Deseja alterar as configurações do jogo? (S/N) ")
-                if change_options.lower() == "s":
-                    start_game(user, topics, choose_difficulty=False, choose_topic=False)
+    def current_account():
+        def get_account():
+            account = input("\nÉ sua primeira vez no word game? ")
+            while True:
+                if account.lower() == "s":
+                    register_user()
+                elif account.lower() == "n":
+                    login_user()
                 else:
-                    start_game(user, topics, choose_difficulty, choose_topic)
-            elif replay.lower() == "n":
-                start_navbar(user)
+                    print("comando não detectado")
+                    account = input("\nÉ sua primeira vez no word game? ")
+
+        def register_user():
+            print("\nCrie sua Conta\n")
+            nickname = input("Digite seu nome de usuário: ")
+            password = input("Digite sua senha: ")
+            confirm_password = input("Confirme sua senha: ")
+            is_account_available = mn.available_account(nickname)
+            if password != confirm_password:
+                is_account_available = False
+                print("\nAs senhas não são iguais...")
+            if is_account_available:
+                mn.create_account(nickname, password)
+                id = mn.get_id(nickname)
+                game(id)
             else:
-                print("comando não detectado")
-                replay = input("\nQuer jogar denovo? (S/N): ")
+                register_user()
 
-    def start_options(user):
-        global points
-
-        # menu de opções
-        print('\n-- Configurações --')
-        print('\n1 - Perfil')
-        print('\n2 - Zerar Pontuação')
-
-        print('\n3 - Creditos')
-        print('\n4 - Voltar')
-        select = input('\nSelecione: ')
-
-        # config options
-        while True:
-            if select =='1':
-                print("\n" + ('*' * 14))
-                print("    Perfil")
-                print('*' * 14)
-                print('\nNickname - [ {} ]'.format(user['nickname']))
-                print('Points - [ {} ]'.format(points))
-                input('\nvoltar ')
-                start_navbar(user)
-            elif select =='2':
-                print('\nPontuação Zerada')
-                points = 0
-                start_navbar(user)
-            elif select =='3':
-                print("\n" + ('*' * 14))
-                print("   Creditos")
-                print('*' * 14)
-                print('\nAutor - [ {} ]'.format(author))
-                input('\nvoltar ')
-                start_navbar(user)
-            elif select =='4':
-                start_navbar(user)
+        def login_user():
+            print("\nLogin\n")
+            nickname = input("Digite seu nome de usuário: ")
+            password = input("Digite sua senha: ")
+            is_account = mn.login(nickname, password)
+            if is_account:
+                print("\nconta acessada com sucesso!\n")
+                print("User:", nickname, password)
+                id = mn.get_id(nickname)
+                game(id)
             else:
-                print("comando não detectado")
-                select = input('\nselecione: ')
+                print("\nconta não encontrada")
+                get_account()
 
-    def start_navbar(user):
-        # menu de jogo
-        print("\n-- Menu de Jogo --")
-        print('\n1 - Jogar')
-        print('\n2 - Ver Pontuação Atual')
-        print('\n3 - Opções')
-        print('\n4 - Sair')
-        selection = input("\nSelecione: ")
+        get_account()
 
-        # config options
-        while True:
-            if selection == "1":
-                start_game(user, topics, choose_difficulty=False, choose_topic=False)
-            elif selection == "2":
-                string_points = 'você tem {} pontos'.format(points)
-                print('\n' + '*' * len(string_points))
-                print('\n{}'.format(string_points))
-                print('\n' + '*' * len(string_points))
-                start_navbar(user)
-            elif selection == "3":
-                start_options(user)
-            elif selection == "4":
-                print("\nexit\n")N
-                exit()
+    def game(id):
+        def start_game(topics, choose_difficulty, choose_topic):
+            if not choose_difficulty and not choose_topic:
+                print("\nEscolha a dificuldade")
+                print("1 - Iniciante")
+                print("2 - Intermediário")
+                print("3 - Avançado")
+                choose_difficulty = input("Selecione: ")
+                print("\nEscolha o tema")
+                print("1 - Animais")
+                print("2 - Frutas")
+                print("3 - Persongens Bíblicos")
+                choose_topic = input("Selecione: ")
+            print("\n" + ("*" * 14))
+            print("  START GAME")
+            print("*" * 14)
+            print("\ntotal de pontos - [ {} ]".format(mn.show_points(id)))
+
+            sentences_replay = [
+                "Poxa não foi dessa vez... Tente mais uma vez",
+                "Vamos lá, você consegue!",
+                "Nossa passou perto...",
+            ]
+
+            word = choice(topics[choose_topic][choose_difficulty])
+            scrambled_word = []
+
+            def shuffle_word(string):
+                for i in string:
+                    scrambled_word.append(i)
+                shuffle(scrambled_word)
+                return " ".join(scrambled_word)
+
+            print("\n--- [ {} ] --- ".format(shuffle_word(word).upper()))
+
+            result, c, attempt = False, 0, ""
+
+            while c < 5:
+                c += 1
+                print("\nVocê tem {} chances".format(str(6 - c))) if c != 5 else print(
+                    "\nÚltima chance"
+                )
+                attempt = input("\nTentativa numero {}: ".format(c))
+                if attempt.lower() == word.lower():
+                    result = True
+                    break
+
+            if result:
+                print("\nVocê Conseguiu!!! - na {} tentaviva\n".format(c))
+                if c == 1:
+                    mn.sum_points(id, 50)
+                    print(
+                        "vc recebeu mais 50 pontos ficando com "
+                        + str(mn.show_points(id))
+                    )
+                elif c == 2:
+                    mn.sum_points(id, 40)
+                    print(
+                        "vc recebeu mais 40 pontos ficando com "
+                        + str(mn.show_points(id))
+                    )
+                elif c == 3:
+                    mn.sum_points(id, 30)
+                    print(
+                        "vc recebeu mais 30 pontos ficando com "
+                        + str(mn.show_points(id))
+                    )
+                elif c == 4:
+                    mn.sum_points(id, 20)
+                    print(
+                        "vc recebeu mais 20 pontos ficando com "
+                        + str(mn.show_points(id))
+                    )
+                else:
+                    mn.sum_points(id, 10)
+                    print(
+                        "vc recebeu mais 10 pontos ficando com "
+                        + str(mn.show_points(id))
+                    )
             else:
-                print("comando não detectado")
-                selection = input("\nSelecione: ")
-    
-    get_account()
-    
+                print("\n" + choice(sentences_replay) + "\n")
+                print("A palavra era -- {} --".format(word))
+
+            replay = input("\nQuer jogar denovo? (S/N): ")
+
+            while True:
+                if replay.lower() == "s":
+                    change_options = input(
+                        "Deseja alterar as configurações do jogo? (S/N) "
+                    )
+                    if change_options.lower() == "s":
+                        start_game(topics, choose_difficulty=False, choose_topic=False)
+                    else:
+                        start_game(topics, choose_difficulty, choose_topic)
+                elif replay.lower() == "n":
+                    start_navbar()
+                else:
+                    print("comando não detectado")
+                    replay = input("\nQuer jogar denovo? (S/N): ")
+
+        def start_options():
+            print("\n-- Configurações --")
+            print("\n1 - Perfil")
+            print("\n2 - Zerar Pontuação")
+            print("\n3 - Creditos")
+            print("\n4 - Voltar")
+            select = input("\nSelecione: ")
+            while True:
+                if select == "1":
+                    print("\n" + ("*" * 14))
+                    print("    Perfil")
+                    print("*" * 14)
+                    print("\nNickname - [ {} ]".format(mn.show_nickname(id)))
+                    print("Points - [ {} ]".format(mn.show_points(id)))
+                    input("\nvoltar ")
+                    start_navbar()
+                elif select == "2":
+                    print("\nPontuação Zerada")
+                    mn.delete_points(id)
+                    start_navbar()
+                elif select == "3":
+                    print("\n" + ("*" * 14))
+                    print("   Creditos")
+                    print("*" * 14)
+                    print(
+                        "\nAutores:\n{}\n{}".format((authors[0]), (authors[1])),
+                    )
+                    input("\nvoltar ")
+                    start_navbar()
+                elif select == "4":
+                    start_navbar()
+                else:
+                    print("comando não detectado")
+                    select = input("\nselecione: ")
+
+        def start_navbar():
+            print("\n-- Menu de Jogo --")
+            print("\n1 - Jogar")
+            print("\n2 - Ver Pontuação Atual")
+            print("\n3 - Opções")
+            print("\n4 - Fechar jogo")
+            selection = input("\nSelecione: ")
+            while True:
+                if selection == "1":
+                    start_game(topics, choose_difficulty=False, choose_topic=False)
+                elif selection == "2":
+                    print("\nvocê tem {} pontos".format(mn.show_points(id)))
+                    start_navbar()
+                elif selection == "3":
+                    start_options()
+                elif selection == "4":
+                    print("\nexit\n")
+                    exit()
+                else:
+                    print("comando não detectado")
+                    selection = input("\nSelecione: ")
+
+        start_navbar()
+
+    current_account()
+
 
 if __name__ == "__main__":
-    main(db)
+    main()
