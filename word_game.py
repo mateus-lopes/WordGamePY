@@ -174,7 +174,7 @@ def main():
 
     def game(id):
 
-        def select_opitions(options, title):
+        def select_options(options, title):
             print('\n{}:'.format(title.capitalize()))
             [print('{} - {}'.format((index+1), option)) for index, option in enumerate(options) ]
             choice = input("Selecione: ")
@@ -192,11 +192,8 @@ def main():
                 print("2 - Intermediário")
                 print("3 - Avançado")
                 choose_difficulty = input("Selecione: ")
-                print("\nEscolha o tema")
-                print("1 - Animais")
-                print("2 - Frutas")
-                print("3 - Persongens Bíblicos")
-                # choose_topic = select_opitions(['Animais', 'Frutas', 'Persongens Bíblicos'], 'Tema')
+                
+                choose_topic = select_options(['Animais', 'Frutas', 'Persongens Bíblicos'], 'Tema')
 
             print_title('start game')
             print("\ntotal de pontos - [ {} ]".format(mn.show_points(id)))
@@ -312,7 +309,7 @@ def main():
                         "\nAutores:\n{}\n{}".format((authors[0]), (authors[1])),
                     )
                     input("\nvoltar ")
-                    start_options()
+                    start_navbar()
                 elif select == "4":
                     start_navbar()
                 else:
