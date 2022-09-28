@@ -1,5 +1,8 @@
 import sqlite3
-from functions import randomic_id as ri
+
+from ..randomic_id import generate_available_id
+
+# users
 
 
 def available_account(nickname):
@@ -23,15 +26,12 @@ def create_account(nickname, password):
     db = sqlite3.connect("db.sqlite3")
     cursor = db.cursor()
     try:
-        id = ri.randomic_id()
-        is_id_available = compare_id_account(id)
-        while is_id_available == False:
-            id = ri.randomic_id()
-            is_id_available = compare_id_account(id)
+        command = "SELECT user_id FROM users"
+        id = generate_available_id(command)
         points = 0
         cursor.execute(
             "INSERT INTO users VALUES('"
-            + id
+            + str(id)
             + "',"
             + str(points)
             + ",'"
@@ -62,22 +62,10 @@ def login(nickname, password):
         print("Error: ", error)
 
 
-def compare_id_account(id):
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-    is_id_available = True
-    cursor.execute("SELECT id FROM users")
-    all_id = cursor.fetchall()
-    for i in all_id:
-        if i[0] == id:
-            is_id_available = False
-    return is_id_available
-
-
 def get_id(nickname):
     db = sqlite3.connect("db.sqlite3")
     cursor = db.cursor()
-    cursor.execute("SELECT id FROM users WHERE nickname = '" + nickname + "'")
+    cursor.execute("SELECT user_id FROM users WHERE nickname = '" + nickname + "'")
     id = (cursor.fetchone())[0]
     return id
 
@@ -85,7 +73,7 @@ def get_id(nickname):
 def show_nickname(id):
     db = sqlite3.connect("db.sqlite3")
     cursor = db.cursor()
-    cursor.execute("SELECT nickname FROM users WHERE id = '" + id + "'")
+    cursor.execute("SELECT nickname FROM users WHERE user_id = '" + str(id) + "'")
     nickname = (cursor.fetchone())[0]
     return nickname
 
@@ -93,7 +81,7 @@ def show_nickname(id):
 def show_points(id):
     db = sqlite3.connect("db.sqlite3")
     cursor = db.cursor()
-    cursor.execute("SELECT points FROM users WHERE id = '" + id + "'")
+    cursor.execute("SELECT points FROM users WHERE user_id = '" + str(id) + "'")
     points = (cursor.fetchone())[0]
     return points
 
@@ -105,7 +93,11 @@ def sum_points(id, value):
         new_value = show_points(id)
         new_value += value
         cursor.execute(
-            "UPDATE users SET points = '" + str(new_value) + "' WHERE id = '" + id + "'"
+            "UPDATE users SET points = '"
+            + str(new_value)
+            + "' WHERE user_id = '"
+            + str(id)
+            + "'"
         )
         db.commit()
         db.close()
@@ -118,7 +110,11 @@ def delete_points(id):
     cursor = db.cursor()
     try:
         cursor.execute(
-            "UPDATE users SET points = '" + str(0) + "' WHERE id = '" + id + "'"
+            "UPDATE users SET points = '"
+            + str(0)
+            + "' WHERE user_id = '"
+            + str(id)
+            + "'"
         )
         db.commit()
         db.close()
@@ -133,9 +129,6 @@ def delete_points(id):
 def delete_account(id):
     db = sqlite3.connect("db.sqlite3")
     cursor = db.cursor()
-    cursor.execute("DELETE from users WHERE id == '" + id + "'")
+    cursor.execute("DELETE from users WHERE user_id == '" + str(id) + "'")
     db.commit()
-
-
-# cursor.execute("DELETE from users")
-# db.commit()
+    db.close

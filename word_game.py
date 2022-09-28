@@ -4,20 +4,13 @@
 """ WORD GAME """
 import sys
 from random import shuffle, choice
-from functions import manage_db as mn
+from functions.manage_tables import users, words, topics, difficulty
 
+# from functions import manage_db as mn
 
-topics = {
+topic = {
     "1": {
-        "1": [
-            "Ema",
-            "Naja",
-            "Vaca",
-            "Zebu",
-            "Foca",
-            "Rato",
-            "Leão"
-        ],
+        "1": ["Ema", "Naja", "Vaca", "Zebu", "Foca", "Rato", "Leão"],
         "2": [
             "Hiena",
             "Sagui",
@@ -51,14 +44,7 @@ topics = {
         ],
     },
     "2": {
-        "1": [
-            "Noz", 
-            "Açaí", 
-            "Maçã", 
-            "Kiwi", 
-            "Coco", 
-            "Romã"
-        ],
+        "1": ["Noz", "Açaí", "Maçã", "Kiwi", "Coco", "Romã"],
         "2": [
             "Ajarí",
             "Amora",
@@ -130,7 +116,7 @@ topics = {
     },
 }
 authors = [
-    "mateus-lopes -> https://github.com/mateus-lopes",
+    "mateus-lnopes -> https://github.com/mateus-lopes",
     "lucasxaviervieira -> https://github.com/lucasxaviervieira ",
 ]
 
@@ -159,13 +145,13 @@ def main():
             nickname = input("Digite seu nome de usuário: ")
             password = input("Digite sua senha: ")
             confirm_password = input("Confirme sua senha: ")
-            is_account_available = mn.available_account(nickname)
+            is_account_available = users.available_account(nickname)
             if password != confirm_password:
                 is_account_available = False
                 print("\nAs senhas não são iguais...")
             if is_account_available:
-                mn.create_account(nickname, password)
-                id = mn.get_id(nickname)
+                users.create_account(nickname, password)
+                id = users.get_id(nickname)
                 game(id)
             else:
                 register_user()
@@ -174,11 +160,11 @@ def main():
             print("\nLogin\n")
             nickname = input("Digite seu nome de usuário: ")
             password = input("Digite sua senha: ")
-            is_account = mn.login(nickname, password)
+            is_account = users.login(nickname, password)
             if is_account:
                 print("\nconta acessada com sucesso!\n")
                 print("User:", nickname, password)
-                id = mn.get_id(nickname)
+                id = users.get_id(nickname)
                 game(id)
             else:
                 print("\nconta não encontrada")
@@ -187,7 +173,7 @@ def main():
         get_account()
 
     def game(id):
-        def start_game(topics, choose_difficulty, choose_topic):
+        def start_game(topic, choose_difficulty, choose_topic):
             if not choose_difficulty and not choose_topic:
                 print("\nEscolha a dificuldade")
                 print("1 - Iniciante")
@@ -202,7 +188,7 @@ def main():
             print("\n" + ("*" * 14))
             print("  START GAME")
             print("*" * 14)
-            print("\ntotal de pontos - [ {} ]".format(mn.show_points(id)))
+            print("\ntotal de pontos - [ {} ]".format(users.show_points(id)))
 
             sentences_replay = [
                 "Poxa não foi dessa vez... Tente mais uma vez",
@@ -210,7 +196,7 @@ def main():
                 "Nossa passou perto...",
             ]
 
-            word = choice(topics[choose_topic][choose_difficulty])
+            word = choice(topic[choose_topic][choose_difficulty])
             scrambled_word = []
 
             def shuffle_word(string):
@@ -236,34 +222,34 @@ def main():
             if result:
                 print("\nVocê Conseguiu!!! - na {} tentaviva\n".format(c))
                 if c == 1:
-                    mn.sum_points(id, 50)
+                    users.sum_points(id, 50)
                     print(
                         "vc recebeu mais 50 pontos ficando com "
-                        + str(mn.show_points(id))
+                        + str(users.show_points(id))
                     )
                 elif c == 2:
-                    mn.sum_points(id, 40)
+                    users.sum_points(id, 40)
                     print(
                         "vc recebeu mais 40 pontos ficando com "
-                        + str(mn.show_points(id))
+                        + str(users.show_points(id))
                     )
                 elif c == 3:
-                    mn.sum_points(id, 30)
+                    users.sum_points(id, 30)
                     print(
                         "vc recebeu mais 30 pontos ficando com "
-                        + str(mn.show_points(id))
+                        + str(users.show_points(id))
                     )
                 elif c == 4:
-                    mn.sum_points(id, 20)
+                    users.sum_points(id, 20)
                     print(
                         "vc recebeu mais 20 pontos ficando com "
-                        + str(mn.show_points(id))
+                        + str(users.show_points(id))
                     )
                 else:
-                    mn.sum_points(id, 10)
+                    users.sum_points(id, 10)
                     print(
                         "vc recebeu mais 10 pontos ficando com "
-                        + str(mn.show_points(id))
+                        + str(users.show_points(id))
                     )
             else:
                 print("\n" + choice(sentences_replay) + "\n")
@@ -277,9 +263,9 @@ def main():
                         "Deseja alterar as configurações do jogo? (S/N) "
                     )
                     if change_options.lower() == "s":
-                        start_game(topics, choose_difficulty=False, choose_topic=False)
+                        start_game(topic, choose_difficulty=False, choose_topic=False)
                     else:
-                        start_game(topics, choose_difficulty, choose_topic)
+                        start_game(topic, choose_difficulty, choose_topic)
                 elif replay.lower() == "n":
                     start_navbar()
                 else:
@@ -298,13 +284,13 @@ def main():
                     print("\n" + ("*" * 14))
                     print("    Perfil")
                     print("*" * 14)
-                    print("\nNickname - [ {} ]".format(mn.show_nickname(id)))
-                    print("Points - [ {} ]".format(mn.show_points(id)))
+                    print("\nNickname - [ {} ]".format(users.show_nickname(id)))
+                    print("Points - [ {} ]".format(users.show_points(id)))
                     input("\nvoltar ")
                     start_navbar()
                 elif select == "2":
                     print("\nPontuação Zerada")
-                    mn.delete_points(id)
+                    users.delete_points(id)
                     start_navbar()
                 elif select == "3":
                     print("\n" + ("*" * 14))
@@ -317,6 +303,20 @@ def main():
                     start_navbar()
                 elif select == "4":
                     start_navbar()
+                elif select == "5":
+                    word = input("\nPalavra para adicionar: ")
+                    topic = topics.show_topics()
+                    print(topic)
+                    topic = input("\nDigite o nome do tópico para escolher: ")
+                    words.add_word(word, topic)
+                elif select == "6":
+                    print(topics.show_topics())
+                    topic = input("\nSelecione o tópico pelo número: \n")
+                    print(difficulty.show_diff())
+                    diff = input("\nSelecione a dificuldade pelo número: \n")
+                    topic_id = topics.get_topic_id(topic)
+                    diff_id = difficulty.get_diff_id_by_pos(diff)
+                    print(words.get_word_filtered(topic_id, diff_id))
                 else:
                     print("comando não detectado")
                     select = input("\nselecione: ")
@@ -330,15 +330,15 @@ def main():
             selection = input("\nSelecione: ")
             while True:
                 if selection == "1":
-                    start_game(topics, choose_difficulty=False, choose_topic=False)
+                    start_game(topic, choose_difficulty=False, choose_topic=False)
                 elif selection == "2":
-                    print("\nvocê tem {} pontos".format(mn.show_points(id)))
+                    print("\nvocê tem {} pontos".format(users.show_points(id)))
                     start_navbar()
                 elif selection == "3":
                     start_options()
                 elif selection == "4":
                     print("\nexit\n")
-                    exit()
+                    sys.exit()
                 else:
                     print("comando não detectado")
                     selection = input("\nSelecione: ")
