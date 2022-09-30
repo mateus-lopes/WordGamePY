@@ -6,8 +6,6 @@ import sys
 from random import shuffle, choice
 from functions.manage_tables import users, words, topics, difficulty
 
-# from functions import manage_db as mn
-
 topic = {
     "1": {
         "1": ["Ema", "Naja", "Vaca", "Zebu", "Foca", "Rato", "Leão"],
@@ -311,11 +309,9 @@ def main():
                     words.add_word(word, topic)
                 elif select == "6":
                     print(topics.show_topics())
-                    topic = input("\nSelecione o tópico pelo número: \n")
+                    topic_id = int(input("\nSelecione o tópico pelo número: \n"))
                     print(difficulty.show_diff())
-                    diff = input("\nSelecione a dificuldade pelo número: \n")
-                    topic_id = topics.get_topic_id(topic)
-                    diff_id = difficulty.get_diff_id_by_pos(diff)
+                    diff_id = int(input("\nSelecione a dificuldade pelo número: \n"))
                     print(words.get_word_filtered(topic_id, diff_id))
                 else:
                     print("comando não detectado")

@@ -21,6 +21,15 @@ def compare_id(id, command):
     return is_id_available
 
 
+def last_id(command):
+    db = sqlite3.connect("db.sqlite3")
+    cursor = db.cursor()
+    cursor.execute(command)
+    n_properties = cursor.fetchall()
+    my_last_id = len(n_properties)
+    return my_last_id
+
+
 def generate_available_id(command):
     while True:
         id = randomic_id()

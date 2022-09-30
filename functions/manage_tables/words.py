@@ -1,8 +1,9 @@
 import sqlite3
 
-from functions import randomic_id as ri
 from functions.manage_tables import topics as tp
 from functions.manage_tables import difficulty as df
+
+from ..create_id import last_id
 
 
 # words
@@ -22,14 +23,14 @@ def add_word(input_word, input_topic):
         db = sqlite3.connect("db.sqlite3")
         cursor = db.cursor()
 
-        command = "SELECT topic_id FROM topics"
-        id = ri.generate_available_id(command)
+        select_word = "SELECT word FROM words"
+        id = last_id(select_word)
 
         diff_id = df.get_diff_id(input_word)
 
         cursor.execute(
             "INSERT INTO words VALUES('"
-            + str(id)
+            + str(id + 1)
             + "',"
             + str(topic_id)
             + ",'"
@@ -54,9 +55,6 @@ def get_word_filtered(topic_id, diff_id):
         if i[0] == diff_id:
             words.append(i[1])
     return words
-
-
-# get_word_filtered(659721384, 312854967)
 
 
 def get_all_words():

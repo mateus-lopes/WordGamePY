@@ -1,6 +1,6 @@
 import sqlite3
 
-from ..randomic_id import generate_available_id
+from ..create_id import last_id
 
 # topics
 
@@ -8,7 +8,7 @@ from ..randomic_id import generate_available_id
 def show_topics():
     db = sqlite3.connect("db.sqlite3")
     cursor = db.cursor()
-    cursor.execute("SELECT position, topic FROM topics")
+    cursor.execute("SELECT topic_id, topic FROM topics")
     topics = []
     for i in cursor.fetchall():
         topics.append(i)
@@ -40,17 +40,11 @@ def create_topic(topic):
     n_topics = cursor.fetchall()
     n = len(n_topics)
 
-    command = "SELECT topic_id FROM topics"
-    id = generate_available_id(command)
+    select_topic = "SELECT topic FROM topics"
+    the_last_id = last_id(select_topic)
 
     cursor.execute(
-        "INSERT INTO topics VALUES('"
-        + str(id)
-        + "', '"
-        + str(n + 1)
-        + "','"
-        + topic
-        + "')"
+        "INSERT INTO topics VALUES('" + str(the_last_id + 1) + "', '" + topic + "')"
     )
     db.commit()
     db.close()
@@ -62,13 +56,3 @@ def create_topic(topic):
 def use_topic(topic):
     topic_id = read_id_topic(topic)
     return topic_id
-
-
-def get_topic_id(position):
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-    cursor.execute(
-        "SELECT topic_id FROM topics WHERE position = '" + str(position) + "'"
-    )
-    id = (cursor.fetchone())[0]
-    return id

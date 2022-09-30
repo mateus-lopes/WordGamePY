@@ -1,40 +1,40 @@
 import sqlite3
 
-from ..randomic_id import generate_available_id
+from ..create_id import generate_available_id
 
 # difficulty
 
 # def create_difficulty():
 #     print("cria dificuldade")
 
-# def delete_difficulty():
+# def update_difficulty():
 #     print("apaga dificuldade")
 
 
 def show_diff():
     db = sqlite3.connect("db.sqlite3")
     cursor = db.cursor()
-    cursor.execute("SELECT position, diff FROM difficulty")
+    cursor.execute("SELECT diff_id, diff FROM difficulty")
     difficulties = []
     for i in cursor.fetchall():
         difficulties.append(i)
     return difficulties
 
 
-def set_difficulty(word):
+def get_diff_id(word):
     db = sqlite3.connect("db.sqlite3")
     cursor = db.cursor()
 
-    cursor.execute("SELECT max_letter, position FROM difficulty")
+    cursor.execute("SELECT max_letter, diff_id FROM difficulty")
     diff_compiled = cursor.fetchall()
     # append max len 0, for compare max and min letter in iterator
 
     max_letters = [0]
     for i in diff_compiled:
         max_letters.append(i[0])
-    positions = []
+    diff_id = []
     for i in diff_compiled:
-        positions.append(i[1])
+        diff_id.append(i[1])
 
     c = 0
     while c < len(max_letters):
@@ -42,30 +42,5 @@ def set_difficulty(word):
         if c != len(max_letters):
             c2 = c + 1
         if len(word) > max_letters[c] and len(word) <= max_letters[c2]:
-            return positions[c]
+            return diff_id[c]
         c += 1
-
-
-def get_diff_id(word):
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-
-    diff_pos = set_difficulty(word)
-
-    cursor.execute(
-        "SELECT diff_id from difficulty WHERE position = '" + str(diff_pos) + "'"
-    )
-    diff_id = cursor.fetchone()[0]
-
-    return diff_id
-
-
-def get_diff_id_by_pos(position):
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-
-    cursor.execute(
-        "SELECT diff_id from difficulty WHERE position = '" + str(position) + "'"
-    )
-    diff_id = cursor.fetchone()[0]
-    return diff_id
