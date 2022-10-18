@@ -119,15 +119,28 @@ def delete_points(id):
         print("Error: ", error)
 
 
-# def update_nickname():
-#     print("mudando nickname")
+def update_nickname(user_id, nickname):
+    db = sqlite3.connect("db.sqlite3")
+    cursor = db.cursor()
+    try:
+        cursor.execute(
+            "UPDATE users SET nickname = '"
+            + nickname
+            + "' WHERE user_id = '"
+            + str(user_id)
+            + "'"
+        )
+        db.commit()
+        db.close()
+    except sqlite3.Error as error:
+        print("Error: ", error)
 
 
 def delete_account(id):
     db = sqlite3.connect("db.sqlite3")
     cursor = db.cursor()
     try:
-        cursor.execute("DELETE from users WHERE user_id == '" + str(id) + "'")
+        cursor.execute("DELETE FROM users WHERE user_id == '" + str(id) + "'")
         db.commit()
         db.close
     except sqlite3.Error as error:

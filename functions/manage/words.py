@@ -55,10 +55,21 @@ def get_word_filtered(topic_id, diff_id):
     return words
 
 
-def get_all_words():
+def get_words():
     db = sqlite3.connect("db.sqlite3")
     cursor = db.cursor()
     cursor.execute("SELECT * FROM words")
     words = [i for i in cursor.fetchall()]
     db.close()
     return words
+
+
+def delete_word(word_id):
+    db = sqlite3.connect("db.sqlite3")
+    cursor = db.cursor()
+    try:
+        cursor.execute("DELETE FROM words WHERE word_id = '" + str(word_id) + "'")
+        db.commit()
+        db.close()
+    except sqlite3.Error as error:
+        print("Error: ", error)

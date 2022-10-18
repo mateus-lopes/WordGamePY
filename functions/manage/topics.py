@@ -54,3 +54,15 @@ def use_topic(topic_id):
     topic = cursor.fetchone()[0]
     db.close()
     return topic
+
+
+def delete_topic(topic_id):
+    db = sqlite3.connect("db.sqlite3")
+    cursor = db.cursor()
+    try:
+        cursor.execute("DELETE FROM topics WHERE topic_id = '" + str(topic_id) + "'")
+        cursor.execute("DELETE FROM words WHERE topic_id = '" + str(topic_id) + "'")
+        db.commit()
+        db.close()
+    except sqlite3.Error as error:
+        print("Error: ", error)

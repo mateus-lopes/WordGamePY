@@ -4,7 +4,7 @@
 """ WORD GAME """
 import sys
 from random import shuffle, choice
-from functions.manage_tables import users, words, topics, difficulty
+from functions.manage import users, words, topics, difficulty
 
 topic = {
     "1": {
