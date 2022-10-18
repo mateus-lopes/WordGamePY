@@ -2,24 +2,20 @@ import sqlite3
 
 from ..create_id import generate_available_id
 
-# users
-
 
 def available_account(nickname):
     db = sqlite3.connect("db.sqlite3")
     cursor = db.cursor()
-    try:
-        is_account_available = True
-        cursor.execute("SELECT nickname FROM users")
-        nicknames = cursor.fetchall()
-        for i in nicknames:
-            # i[0] for catching the str in tuple(i)
-            if i[0] == nickname:
-                is_account_available = False
-                print("\nUsuário já existente")
-        return is_account_available
-    except sqlite3.Error as error:
-        print("Error: ", error)
+    is_account_available = True
+    cursor.execute("SELECT nickname FROM users")
+    nicknames = cursor.fetchall()
+    for i in nicknames:
+        # i[0] get str in tuple(i)
+        if i[0] == nickname:
+            is_account_available = False
+            print("\nUsuário já existente")
+    db.close()
+    return is_account_available
 
 
 def create_account(nickname, password):
@@ -46,20 +42,18 @@ def create_account(nickname, password):
         print("Error: ", error)
 
 
-def login(nickname, password):
+def is_account(nickname, password):
     db = sqlite3.connect("db.sqlite3")
     cursor = db.cursor()
-    try:
-        is_account = False
-        cursor.execute("SELECT nickname FROM users WHERE password = '" + password + "'")
-        nicknames = cursor.fetchall()
-        for i in nicknames:
-            # i[0] for catching the str in tuple(i)
-            if i[0] == nickname:
-                is_account = True
-        return is_account
-    except sqlite3.Error as error:
-        print("Error: ", error)
+    is_account = False
+    cursor.execute("SELECT nickname FROM users WHERE password = '" + password + "'")
+    nicknames = cursor.fetchall()
+    for i in nicknames:
+        # i[0] get str in tuple(i)
+        if i[0] == nickname:
+            is_account = True
+    db.close()
+    return is_account
 
 
 def get_id(nickname):
@@ -67,6 +61,7 @@ def get_id(nickname):
     cursor = db.cursor()
     cursor.execute("SELECT user_id FROM users WHERE nickname = '" + nickname + "'")
     id = (cursor.fetchone())[0]
+    db.close()
     return id
 
 
@@ -75,6 +70,7 @@ def show_nickname(id):
     cursor = db.cursor()
     cursor.execute("SELECT nickname FROM users WHERE user_id = '" + str(id) + "'")
     nickname = (cursor.fetchone())[0]
+    db.close()
     return nickname
 
 
@@ -83,6 +79,7 @@ def show_points(id):
     cursor = db.cursor()
     cursor.execute("SELECT points FROM users WHERE user_id = '" + str(id) + "'")
     points = (cursor.fetchone())[0]
+    db.close()
     return points
 
 
@@ -129,6 +126,9 @@ def delete_points(id):
 def delete_account(id):
     db = sqlite3.connect("db.sqlite3")
     cursor = db.cursor()
-    cursor.execute("DELETE from users WHERE user_id == '" + str(id) + "'")
-    db.commit()
-    db.close
+    try:
+        cursor.execute("DELETE from users WHERE user_id == '" + str(id) + "'")
+        db.commit()
+        db.close
+    except sqlite3.Error as error:
+        print("Error: ", error)

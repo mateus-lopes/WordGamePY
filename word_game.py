@@ -158,14 +158,14 @@ def main():
             print("\nLogin\n")
             nickname = input("Digite seu nome de usuário: ")
             password = input("Digite sua senha: ")
-            is_account = users.login(nickname, password)
+            is_account = users.is_account(nickname, password)
             if is_account:
                 print("\nconta acessada com sucesso!\n")
                 print("User:", nickname, password)
                 id = users.get_id(nickname)
                 game(id)
             else:
-                print("\nconta não encontrada")
+                print("\nconta não existe")
                 get_account()
 
         get_account()
@@ -307,6 +307,8 @@ def main():
                     print(topic)
                     topic = input("\nDigite o nome do tópico para escolher: ")
                     words.add_word(word, topic)
+                    # topics.use_topic(topic_id)
+                    # ^^^ escolher o topíco pelo id ao inves de escrever o nome ^^^
                 elif select == "6":
                     print(topics.show_topics())
                     topic_id = int(input("\nSelecione o tópico pelo número: \n"))
