@@ -9,6 +9,7 @@ packages = [{include = "word_game"}]
 [tool.poetry.dependencies]
 python = "^3.8"
 db-sqlite3 = "^0.0.1"
+passlib = "^1.7.4"
 
 [tool.poetry.group.dev.dependencies]
 black = {version = "^22.8.0", allow-prereleases = true}

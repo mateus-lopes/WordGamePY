@@ -121,7 +121,7 @@ authors = [
 
 def main():
     print(
-        "\nBem vindo ao Word Game, um jogo de raciocínio que irá aumentar seu vocabulario rapidamente.\n"
+        "\nBem vindo ao Word Game, um jogo de raciocínio que irá aumentar seu vocabulário rapidamente.\n"
     )
     print("Responda as perguntas com S/N para logar ou criar uma conta.")
     print('Em caso de duvidas acesse "Ajuda" no menu de configurações')

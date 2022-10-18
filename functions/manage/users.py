@@ -1,6 +1,7 @@
 import sqlite3
 
 from ..create_id import generate_available_id
+from ..hash_password import create_hash, compare_hash
 
 
 def available_account(nickname):
@@ -21,6 +22,9 @@ def available_account(nickname):
 def create_account(nickname, password):
     db = sqlite3.connect("db.sqlite3")
     cursor = db.cursor()
+
+    hashed_password = create_hash(password)
+
     try:
         command = "SELECT user_id FROM users"
         id = generate_available_id(command)
@@ -33,7 +37,7 @@ def create_account(nickname, password):
             + ",'"
             + nickname
             + "','"
-            + password
+            + hashed_password
             + "')"
         )
         db.commit()
@@ -45,13 +49,12 @@ def create_account(nickname, password):
 def is_account(nickname, password):
     db = sqlite3.connect("db.sqlite3")
     cursor = db.cursor()
-    is_account = False
-    cursor.execute("SELECT nickname FROM users WHERE password = '" + password + "'")
-    nicknames = cursor.fetchall()
-    for i in nicknames:
-        # i[0] get str in tuple(i)
-        if i[0] == nickname:
-            is_account = True
+    cursor.execute("SELECT password FROM users WHERE nickname = '" + nickname + "'")
+    password_account = cursor.fetchall()
+    if password_account == []:
+        return "Erro - nickname não existe"
+    password_account = password_account[0][0]
+    is_account = True if compare_hash(password, password_account) else False
     db.close()
     return is_account
 
