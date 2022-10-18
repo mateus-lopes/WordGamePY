@@ -1,7 +1,7 @@
 import sqlite3
 
-from functions.manage_tables import topics as tp
-from functions.manage_tables import difficulty as df
+from functions.manage import topics as tp
+from functions.manage import difficulty as df
 
 from ..create_id import last_id
 
