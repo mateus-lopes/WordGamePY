@@ -4,6 +4,8 @@
 """ WORD GAME """
 import sys
 from random import shuffle, choice
+from functions.classes import User, Word, Topic, Diff
+
 from functions.manage import users, words, topics, difficulty
 
 topic = {
@@ -347,4 +349,68 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    def users_methods():
+        user = User()
+        user.start()
+        """ PARAMETROS: nickname"""
+        # user.available_account("lucasdavid")
+        """ PARAMETROS: nickname, password"""
+        # user.is_account("lucasdavid", "2020")
+        # user.create_account("lucasdavid", "2020")
+        """ PARAMETROS: id"""
+        # print(user.show_nickname(2))
+        """ PARAMETROS: nickname"""
+        # print(user.get_id("lucasdavid"))
+        """ PARAMETROS: id, nickname"""
+        # user.update_nickname(1, "lucas")
+        """ PARAMETROS: id, points_value"""
+        # user.sum_points(1, 50)
+        """ PARAMETROS: id"""
+        # print(user.show_points(1))
+        # user.delete_points(2)
+        # user.delete_account(2)
+        user.close_db()
+
+    def word_methods():
+        word = Word()
+        word.start()
+        # print(word.get_words())
+        """ PARAMETROS: (topic OU topic_id), word """
+        # word.create_word("outr2", "teste")
+        """ PARAMETROS: topic_id, diff_id"""
+        # print(word.select_topic_diff(1, 4))
+        """ PARAMETROS: id"""
+        # word.delete_word(6)
+        word.close_db()
+
+    def topic_methods():
+        topic = Topic()
+        topic.start()
+        # print(topic.show_topics())
+        """ PARAMETROS: topic"""
+        # print(topic.is_new_topic("teste"))
+        # topic.create_topic("outro teste diferente")
+        # print(topic.get_id("outro teste diferente"))
+        """ PARAMETROS: id"""
+        # print(topic.use_topic(6))
+        # topic.delete_topic(5)
+        topic.close_db()
+
+    def diff_methods():
+        diff = Diff()
+        diff.start()
+        # print(diff.show_diff())
+        """ PARAMETROS: word"""
+        # print(diff.get_diff_id("dsadsdsaads"))
+        """ PARAMETROS: sequence, diff"""
+        # diff.create_difficulty(4, "teste")
+        # diff.update_difficulty(2, "Fácil")
+        """ PARAMETROS: id"""
+        # diff.delete_diff(2)
+        diff.close_db()
+
+    users_methods()
+    word_methods()
+    topic_methods()
+    diff_methods()

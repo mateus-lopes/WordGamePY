@@ -1,75 +1,96 @@
+import numbers
 import sqlite3
 
-from functions.manage import topics as tp
-from functions.manage import difficulty as df
+from functions.connect_db import Connect
+from functions.manage.difficulty import Diff
+from functions.manage.topics import Topic
 
-from ..create_id import last_id
 
+class Word:
+    def __init__(self):
+        self.db = Connect()
+        self.df = Diff()
+        self.tp = Topic()
 
-def add_word(input_word, input_topic):
-    word = input_word.capitalize()
-    topic = input_topic.capitalize()
-    max_letter = df.show_diff()[-1][-1]
-    if len(word) <= max_letter:
-        db = sqlite3.connect("db.sqlite3")
-        cursor = db.cursor()
+    def start(self):
+        self.create_schema()
+
+    def create_schema(self):
         try:
-            select_word = "SELECT word FROM words"
-            id = last_id(select_word) + 1
+            with open("functions/manage/sql/words_schema.sql", "rt") as f:
+                schema = f.read()
+                self.db.cursor.executescript(schema)
+        except sqlite3.Error:
+            return False
 
-            topic_id = (
-                tp.create_topic(topic)
-                if tp.is_new_topic(topic)
-                else tp.get_topic_id(topic)
+    def format_input(self, input):
+        numbers = []
+        for i in input:
+            if i.isalpha():
+                continue
+            else:
+                numbers.append(i)
+        numbers = "".join(numbers)
+        return int(numbers)
+
+    def create_word(self, input_topic, word):
+        max_letter = self.df.show_diff()[-1][-1]
+        if len(word) <= max_letter:
+            try:
+                is_alpha = self.tp.topic_is_alpha(input_topic)
+                if is_alpha:
+                    topic_id = (
+                        self.tp.create_topic(input_topic, is_alpha)
+                        if self.tp.is_new_topic(input_topic)
+                        else self.tp.get_id(input_topic)
+                    )
+                else:
+                    input_topic = self.format_input(input_topic)
+                    topic_id = (
+                        input_topic if self.tp.topic_exists(input_topic) else None
+                    )
+
+                if topic_id:
+                    pass
+                else:
+                    print("Erro: Tópico não existe")
+                    return False
+
+                diff_id = self.df.get_diff_id(word)
+
+                self.db.cursor.execute(
+                    "INSERT INTO words (topic_id,diff_id,word) VALUES (?,?,?)",
+                    (topic_id, diff_id, word),
+                )
+                self.db.commit_db()
+            except sqlite3.Error as error:
+                print("Error: ", error)
+        else:
+            print("Erro: Palavra ultrapassa o número de caracteres")
+
+    def get_words(self):
+        select = self.db.cursor.execute("SELECT * FROM words")
+        words = [i for i in select.fetchall()]
+        return words
+
+    def select_topic_diff(self, topic_id, diff_id):
+        select = self.db.cursor.execute(
+            "SELECT topic_id, diff_id, word FROM words WHERE topic_id = {}".format(
+                topic_id
             )
-            diff_id = df.get_diff_id(word)
+        )
+        words = [i for i in select.fetchall() if i[1] == diff_id]
+        return words
 
-            cursor.execute(
-                "INSERT INTO words VALUES('"
-                + str(id)
-                + "',"
-                + str(topic_id)
-                + ",'"
-                + str(diff_id)
-                + "','"
-                + word
-                + "')"
-            )
-
-            db.commit()
-            db.close()
+    def delete_word(self, id):
+        try:
+            self.db.cursor.execute("DELETE FROM words WHERE id = {}".format(id))
+            self.db.commit_db()
         except sqlite3.Error as error:
             print("Error: ", error)
-    else:
-        print("palavra inválida")
 
+    def drop_table(self):
+        self.db.cursor.execute("DROP TABLE words")
 
-def get_word_filtered(topic_id, diff_id):
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-    cursor.execute(
-        "SELECT diff_id, word FROM words WHERE topic_id = '" + str(topic_id) + "'"
-    )
-    words = [i[1] for i in cursor.fetchall() if i[0] == diff_id]
-    db.close()
-    return words
-
-
-def get_words():
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM words")
-    words = [i for i in cursor.fetchall()]
-    db.close()
-    return words
-
-
-def delete_word(word_id):
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-    try:
-        cursor.execute("DELETE FROM words WHERE word_id = '" + str(word_id) + "'")
-        db.commit()
-        db.close()
-    except sqlite3.Error as error:
-        print("Error: ", error)
+    def close_db(self):
+        self.db.close_db()

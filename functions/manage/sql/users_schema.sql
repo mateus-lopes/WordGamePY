@@ -1,0 +1,6 @@
+CREATE TABLE users (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	points INTEGER,
+	nickname TEXT UNIQUE,
+	password TEXT NOT NULL
+);

@@ -1,150 +1,112 @@
 import sqlite3
 
-from ..create_id import generate_available_id
-from ..hash_password import create_hash, compare_hash
+from functions.connect_db import Connect
+from functions.hash_password import create_hash, compare_hash
 
 
-def available_account(nickname):
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-    is_account_available = True
-    cursor.execute("SELECT nickname FROM users")
-    nicknames = cursor.fetchall()
-    for i in nicknames:
-        # i[0] get str in tuple(i)
-        if i[0] == nickname:
-            is_account_available = False
-            print("\nUsuário já existente")
-    db.close()
-    return is_account_available
+class User:
+    def __init__(self):
+        self.db = Connect()
 
+    def start(self):
+        try:
+            with open("functions/manage/sql/users_schema.sql", "rt") as f:
+                schema = f.read()
+                self.db.cursor.executescript(schema)
+        except sqlite3.Error:
+            return False
 
-def create_account(nickname, password):
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-
-    hashed_password = create_hash(password)
-
-    try:
-        command = "SELECT user_id FROM users"
-        id = generate_available_id(command)
-        points = 0
-        cursor.execute(
-            "INSERT INTO users VALUES('"
-            + str(id)
-            + "',"
-            + str(points)
-            + ",'"
-            + nickname
-            + "','"
-            + hashed_password
-            + "')"
+    def available_account(self, nickname):
+        select = self.db.cursor.execute(
+            "SELECT nickname FROM users WHERE nickname = (?)", ((nickname,))
         )
-        db.commit()
-        db.close()
-    except sqlite3.Error as error:
-        print("Error: ", error)
+        db_list = select.fetchone()
+        is_account_available = False if db_list else True
+        None if is_account_available else print("Erro: Usuário já existe")
+        return is_account_available
 
+    def create_account(self, nickname, password):
+        try:
+            hashed_password = create_hash(password)
+            points = 0
+            self.db.cursor.execute(
+                "INSERT INTO users (points, nickname, password) VALUES (?,?,?)",
+                (points, nickname, hashed_password),
+            )
+            self.db.commit_db()
+        except sqlite3.Error:
+            print("Erro: Usuário já existe")
 
-def is_account(nickname, password):
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-    cursor.execute("SELECT password FROM users WHERE nickname = '" + nickname + "'")
-    password_account = cursor.fetchall()
-    if password_account == []:
-        return "Erro - nickname não existe"
-    password_account = password_account[0][0]
-    is_account = True if compare_hash(password, password_account) else False
-    db.close()
-    return is_account
-
-
-def get_id(nickname):
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-    cursor.execute("SELECT user_id FROM users WHERE nickname = '" + nickname + "'")
-    id = (cursor.fetchone())[0]
-    db.close()
-    return id
-
-
-def show_nickname(id):
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-    cursor.execute("SELECT nickname FROM users WHERE user_id = '" + str(id) + "'")
-    nickname = (cursor.fetchone())[0]
-    db.close()
-    return nickname
-
-
-def show_points(id):
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-    cursor.execute("SELECT points FROM users WHERE user_id = '" + str(id) + "'")
-    points = (cursor.fetchone())[0]
-    db.close()
-    return points
-
-
-def sum_points(id, value):
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-    try:
-        new_value = show_points(id)
-        new_value += value
-        cursor.execute(
-            "UPDATE users SET points = '"
-            + str(new_value)
-            + "' WHERE user_id = '"
-            + str(id)
-            + "'"
+    def is_account(self, nickname, password):
+        select = self.db.cursor.execute(
+            "SELECT password FROM users WHERE nickname = (?)", ((nickname,))
         )
-        db.commit()
-        db.close()
-    except sqlite3.Error as error:
-        print("Error: ", error)
+        password_account = select.fetchall()
+        if password_account == []:
+            print("Erro: Conta não encontrada")
+            return False
+        password_account = password_account[0][0]
+        is_account = True if compare_hash(password, password_account) else False
+        None if is_account else print("Erro: Senha incorreta")
+        return is_account
 
-
-def delete_points(id):
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-    try:
-        cursor.execute(
-            "UPDATE users SET points = '"
-            + str(0)
-            + "' WHERE user_id = '"
-            + str(id)
-            + "'"
+    def get_id(self, nickname):
+        select = self.db.cursor.execute(
+            "SELECT id FROM users WHERE nickname = (?)", ((nickname,))
         )
-        db.commit()
-        db.close()
-    except sqlite3.Error as error:
-        print("Error: ", error)
+        id = select.fetchone()
+        return id[0] if id else "Erro: Usuário não encontrado"
 
-
-def update_nickname(user_id, nickname):
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-    try:
-        cursor.execute(
-            "UPDATE users SET nickname = '"
-            + nickname
-            + "' WHERE user_id = '"
-            + str(user_id)
-            + "'"
+    def show_nickname(self, id):
+        select = self.db.cursor.execute(
+            "SELECT nickname FROM users WHERE id = (?)", ((id,))
         )
-        db.commit()
-        db.close()
-    except sqlite3.Error as error:
-        print("Error: ", error)
+        nickname = select.fetchone()
+        return nickname[0] if nickname else "Erro: Usuário não encontrado"
 
+    def update_nickname(self, id, nickname):
+        try:
+            self.db.cursor.execute(
+                "UPDATE users SET nickname = ? WHERE id = ?", (nickname, id)
+            )
+            self.db.commit_db()
+        except sqlite3.Error:
+            print("Erro: nickname já está em uso")
 
-def delete_account(id):
-    db = sqlite3.connect("db.sqlite3")
-    cursor = db.cursor()
-    try:
-        cursor.execute("DELETE FROM users WHERE user_id == '" + str(id) + "'")
-        db.commit()
-        db.close
-    except sqlite3.Error as error:
-        print("Error: ", error)
+    def show_points(self, id):
+        select = self.db.cursor.execute(
+            "SELECT points FROM users WHERE id = (?)", ((id,))
+        )
+        points = select.fetchone()
+        return points[0] if points else "Erro: Usuário não encontrado"
+
+    def sum_points(self, id, value):
+        try:
+            new_value = self.show_points(id)
+            new_value += value
+            self.db.cursor.execute(
+                "UPDATE users SET points = ? WHERE id = ?", (new_value, id)
+            )
+            self.db.commit_db()
+        except sqlite3.Error as error:
+            print("Error: ", error)
+
+    def delete_points(self, id):
+        try:
+            self.db.cursor.execute("UPDATE users SET points = ? WHERE id = ?", (0, id))
+            self.db.commit_db()
+        except sqlite3.Error as error:
+            print("Error: ", error)
+
+    def delete_account(self, id):
+        try:
+            self.db.cursor.execute("DELETE FROM users WHERE id == ?", ((id,)))
+            self.db.commit_db()
+        except sqlite3.Error as error:
+            print("Error: ", error)
+
+    def drop_table(self):
+        self.db.cursor.execute("DROP TABLE users")
+
+    def close_db(self):
+        self.db.close_db()
