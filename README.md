@@ -4,4 +4,4 @@
 
 **Desenvolvido em Python**
 
-Com o poetry instalado, utilize o comando `poetry install` dentro do dirétorio clonado
+Com o poetry instalado, utilize o comando `poetry install` dentro do diretório clonado
